@@ -1,0 +1,12 @@
+{
+  "http": {
+    "port": 8080
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "testdb",
+    "user": "postgres",
+    "password": "user"
+  }
+}
