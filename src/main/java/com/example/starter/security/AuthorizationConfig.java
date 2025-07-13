@@ -34,8 +34,12 @@ public class AuthorizationConfig {
       // Administrateur resource
       new ResourceMapping("/users/*", Set.of("admin"), "Administrateur resource"),
       new ResourceMapping("/api/auth/register", Set.of("admin"), "Administrateur resource"),
+      new ResourceMapping("/api/compagnies", Set.of("admin"), "Administrateur resource"),
+      new ResourceMapping("/api/v1/compagnie/save", Set.of("admin"), "Administrateur resource"),
+      new ResourceMapping("/api/v1/compagnies", Set.of("admin"), "Administrateur resource"),
       // // Require admin by default
-      new ResourceMapping("/*", Set.of("admin"), "Default Resource")     );
+      new ResourceMapping("/*", Set.of("admin"), "Default Resource")
+    );
   }
 
 }

@@ -84,7 +84,6 @@ public class PolicyEnforcerHandler implements Handler<RoutingContext> {
 
   private Set<String> extractUserRoles(JsonObject principal) {
     Set<String> roles = new java.util.HashSet<>();
-
     // Extract realm roles
     JsonObject realmAccess = principal.getJsonObject("realm_access");
     if (realmAccess != null) {
@@ -93,7 +92,6 @@ public class PolicyEnforcerHandler implements Handler<RoutingContext> {
         realmRoles.forEach(role -> roles.add(role.toString()));
       }
     }
-
     // Extract client roles if needed
     JsonObject resourceAccess = principal.getJsonObject("resource_access");
     if (resourceAccess != null) {

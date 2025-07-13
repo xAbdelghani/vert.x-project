@@ -33,7 +33,7 @@ public class UserHandler {
       .onSuccess(users -> {
         ctx.response()
           .putHeader("content-type", "application/json")
-          .end(Json.encode(users));  // ✅ Fixed: encode List<User> properly
+          .end(Json.encode(users));
       })
       .onFailure(err -> ctx.response().setStatusCode(500).end());
   }

@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.validation.ValidationException;
 
-public class RegistrationHandler {
+/* public class RegistrationHandler {
 
   private final RegistrationService registrationService;
 
@@ -33,4 +33,4 @@ public class RegistrationHandler {
             .encode());
       });
   }
-}
+}*/

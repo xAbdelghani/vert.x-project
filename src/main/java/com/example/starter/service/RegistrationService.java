@@ -1,13 +1,14 @@
 package com.example.starter.service;
 
-import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
 
 public class RegistrationService {
 
   private final KeycloakAdminService keycloakAdmin;
+
   private final EmailService emailService;
+
 
 
   public RegistrationService(KeycloakAdminService keycloakAdmin, EmailService emailService) {
@@ -15,12 +16,12 @@ public class RegistrationService {
     this.emailService = emailService;
   }
 
-  public Future<JsonObject> registerUser(JsonObject registrationData) {
+  /* ublic Future<JsonObject> registerUser(JsonObject registrationData) {
     return keycloakAdmin.createUser(registrationData)
       .compose(userId -> {
         // Send welcome email (don't fail registration if email fails)
         emailService.sendWelcomeEmail(
-          registrationData.getString("email"),
+        //  registrationData.getString("email"),
           registrationData.getString("username")
         ).onFailure(err -> {
           System.err.println("Failed to send welcome email: " + err.getMessage());
@@ -30,7 +31,7 @@ public class RegistrationService {
           .put("userId", userId)
           .put("message", "User created successfully"));
       });
-  }
+  }*/
 
   private String validateRegistration(JsonObject data) {
     if (!data.containsKey("username") || data.getString("username").isEmpty()) {
@@ -44,6 +45,8 @@ public class RegistrationService {
     }
     return null;
   }
+
+
 
   private boolean isValidEmail(String email) {
     return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");

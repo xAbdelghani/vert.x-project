@@ -28,6 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
       });
   }
 
+
   @Override
   public Future<List<User>> findAll() {
     return pgPool.query("SELECT * FROM users")
@@ -41,12 +42,14 @@ public class UserRepositoryImpl implements UserRepository {
       });
   }
 
+
   @Override
   public Future<User> save(User user) {
     return pgPool.preparedQuery("INSERT INTO users (name) VALUES ($1) RETURNING *")
       .execute(Tuple.of(user.getName()))
       .map(rows -> mapRow(rows.iterator().next()));
   }
+
 
   @Override
   public Future<User> update(User user) {

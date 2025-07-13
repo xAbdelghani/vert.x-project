@@ -17,17 +17,17 @@ public class EmailService {
     this.fromName = config.getString("fromName", "My App");
   }
 
-  public Future<Void> sendWelcomeEmail(String toEmail, String username) {
+  public Future<Void> sendWelcomeEmail(String toEmail, String username, String password) {
     MailMessage message = new MailMessage()
       .setFrom(fromName + " <" + fromEmail + ">")
       .setTo(toEmail)
-      .setSubject("Welcome to Our App!")
-      .setHtml(buildWelcomeHtml(username))
-      .setText(buildWelcomeText(username)); // Fallback for non-HTML clients
+      .setSubject("Your Account Has Been Created")
+      .setHtml(buildWelcomeHtml(username, password))
+      .setText(buildWelcomeText(username, password));
 
-    return mailClient.sendMail(message)
-      .mapEmpty(); // Convert to Future<Void>
+    return mailClient.sendMail(message).mapEmpty();
   }
+
 
   public Future<Void> sendVerificationEmail(String toEmail, String username, String verificationLink) {
     MailMessage message = new MailMessage()
@@ -53,25 +53,32 @@ public class EmailService {
       .mapEmpty();
   }
 
-  private String buildWelcomeHtml(String username) {
+  private String buildWelcomeHtml(String username, String password) {
     return """
-            <html>
-            <body style="font-family: Arial, sans-serif;">
-                <h2>Welcome, %s!</h2>
-                <p>Thank you for registering with our application.</p>
-                <p>You can now login and start using our services.</p>
-                <br>
-                <p>Best regards,<br>The Team</p>
-            </body>
-            </html>
-            """.formatted(username);
+    <html>
+    <body style="font-family: Arial, sans-serif;">
+        <h2>Hello, %s!</h2>
+        <p>Your account has been created successfully.</p>
+        <p><strong>Username:</strong> %s</p>
+        <p><strong>Password:</strong> %s</p>
+        <p>You can now login to your account.</p>
+        <br>
+        <p>Best regards,<br>The Team</p>
+    </body>
+    </html>
+    """.formatted(username, username, password);
   }
 
-  private String buildWelcomeText(String username) {
+
+  private String buildWelcomeText(String username, String password) {
     return String.format(
-      "Welcome, %s!\n\nThank you for registering with our application.\n" +
-        "You can now login and start using our services.\n\nBest regards,\nThe Team",
-      username
+      "Hello, %s!\n\n" +
+        "Your account has been created successfully.\n\n" +
+        "Username: %s\n" +
+        "Password: %s\n\n" +
+        "You can now login to your account.\n\n" +
+        "Best regards,\nThe Team",
+      username, username, password
     );
   }
 

@@ -1,13 +1,15 @@
 package com.example.starter.config;
 
-import com.example.starter.handler.RegistrationHandler;
-import com.example.starter.handler.UserHandler;
+import com.example.starter.handler.*;
+import com.example.starter.repository.AgenceRepository;
+import com.example.starter.repository.ContactRepository;
+import com.example.starter.repository.FonctionRepository;
 import com.example.starter.repository.UserRepository;
-import com.example.starter.repository.impl.UserRepositoryImpl;
-import com.example.starter.service.EmailService;
-import com.example.starter.service.KeycloakAdminService;
-import com.example.starter.service.RegistrationService;
-import com.example.starter.service.UserService;
+import com.example.starter.repository.impl.*;
+import com.example.starter.service.*;
+import com.example.starter.service.impl.AgenceServiceImpl;
+import com.example.starter.service.impl.ContactServiceImpl;
+import com.example.starter.service.impl.FonctionServiceImpl;
 import com.example.starter.service.impl.UserServiceImpl;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -16,7 +18,6 @@ import io.vertx.ext.mail.MailClient;
 import io.vertx.pgclient.PgPool;
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class ServiceRegistry {
 
@@ -46,6 +47,7 @@ public class ServiceRegistry {
 
   private void initCoreServices() {
     MailClient mailClient = MailClientConfig.create(vertx, config.getJsonObject("mail"));
+
     EmailService emailService = new EmailService(mailClient, config.getJsonObject("mail"));
     services.put("emailService", emailService);
 
@@ -53,36 +55,96 @@ public class ServiceRegistry {
     services.put("keycloakAdmin", keycloakAdmin);
   }
 
+
+
   private void initRepositories() {
     repositories.put("userRepository", new UserRepositoryImpl(pgPool));
+    repositories.put("compagnieRepository", new CompagnieRepositoryImpl(pgPool));
+    repositories.put("agenceRepository", new AgenceRepositoryImpl(pgPool));
+    repositories.put("fonctionRepository", new FonctionRepositoryImpl(pgPool));
+    repositories.put("contactRepository", new ContactRepositoryImpl(pgPool));
   }
 
+
   private void initBusinessServices() {
-    // Business logic layer
+
+    // User service
     UserService userService = new UserServiceImpl(
       getRepository("userRepository", UserRepository.class)
     );
     services.put("userService", userService);
 
+    FonctionService fonctionService = new FonctionServiceImpl(
+      getRepository("fonctionRepository", FonctionRepository.class),
+      getRepository("contactRepository", ContactRepository.class)
+    );
+    services.put("fonctionService", fonctionService);
+
+    ContactService contactService = new ContactServiceImpl(
+      getRepository("contactRepository", ContactRepository.class),
+      getRepository("compagnieRepository", CompagnieRepositoryImpl.class),
+      getRepository("fonctionRepository", FonctionRepository.class)
+    );
+    services.put("contactService", contactService);
+
+
+
+    // Registration service for regular users
     RegistrationService registrationService = new RegistrationService(
       getService("keycloakAdmin", KeycloakAdminService.class),
       getService("emailService", EmailService.class)
     );
     services.put("registrationService", registrationService);
+
+
+
+    // Compagnie registration service
+    CompagnieRegistrationService compagnieRegistrationService = new CompagnieRegistrationService(
+      getRepository("compagnieRepository", CompagnieRepositoryImpl.class),
+      getService("keycloakAdmin", KeycloakAdminService.class),
+      getService("emailService", EmailService.class)
+    );
+    services.put("compagnieRegistrationService", compagnieRegistrationService);
+
+
+    AgenceService agenceService = new AgenceServiceImpl(
+      getRepository("agenceRepository", AgenceRepository.class),
+      getRepository("compagnieRepository", CompagnieRepositoryImpl.class)
+    );
+    services.put("agenceService", agenceService);
+
+
   }
 
+
   private void initHandlers() {
-    // Presentation layer
+
+    handlers.put("fonctionHandler", new FonctionHandler(
+      getService("fonctionService", FonctionService.class)
+    ));
+
+    handlers.put("contactHandler", new ContactHandler(
+      getService("contactService", ContactService.class)
+    ));
+
+    handlers.put("agenceHandler", new AgenceHandler(
+      getService("agenceService", AgenceService.class)
+    ));
+    // Handler for regular users
     handlers.put("user", new UserHandler(
       getService("userService", UserService.class)
     ));
-
-    handlers.put("registrationHandler", new RegistrationHandler(
-      getService("registrationService", RegistrationService.class)
+    // Handler for user registration
+    // handlers.put("registrationHandler", new RegistrationHandler(
+    // getService("registrationService", RegistrationService.class)
+    // ));
+    // Handler for compagnie registration
+    handlers.put("compagnieRegistrationHandler", new CompagnieHandler(
+      getService("compagnieRegistrationService", CompagnieRegistrationService.class)
     ));
   }
 
-  // Type-safe getters to avoid casting everywhere
+  // Type-safe getters
   @SuppressWarnings("unchecked")
   public <T> T getHandler(String name, Class<T> type) {
     return (T) handlers.get(name);
@@ -101,4 +163,6 @@ public class ServiceRegistry {
   public OAuth2Auth getOAuth2Auth() {
     return oauth2Auth;
   }
+
+
 }
