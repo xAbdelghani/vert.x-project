@@ -52,6 +52,7 @@ public class AppRouter {
 
     mountFonctionRoutes(router);
     mountContactRoutes(router);
+    mountPointventeRoutes(router);
 
     return router;
   }
@@ -95,9 +96,6 @@ public class AppRouter {
 
     router.delete("/api/compagnies/:id/account")
       .handler(ctx->CompagnieHandler.deleteOnlyAccount(ctx));
-
-
-
   }
 
   private void mountAgenceRoutes(Router router) {
@@ -109,7 +107,6 @@ public class AppRouter {
     router.post("/api/agences").handler(handler::create);
     router.put("/api/agences/:id").handler(handler::update);
     router.delete("/api/agences/:id").handler(handler::delete);
-
     // Special routes
     router.get("/api/agences/compagnie/:compagnieId").handler(handler::getByCompagnie);
     router.get("/api/agences/status").handler(handler::getByStatus);
@@ -138,6 +135,27 @@ public class AppRouter {
     router.put("/api/contacts/:id").handler(handler::updateContact);
     router.delete("/api/contacts/:id").handler(handler::deleteContact);
     router.get("/api/compagnies/:compagnieId/contacts").handler(handler::getContactsByCompagnie);
+  }
+
+
+  private void mountPointventeRoutes(Router router) {
+    PointventeHandler handler = registry.getHandler("pointventeHandler", PointventeHandler.class);
+
+    // Pointvente CRUD
+    router.get("/api/pointventes").handler(handler::getAllPointventes);
+    router.get("/api/pointventes/:id").handler(handler::getPointvente);
+    router.post("/api/pointventes").handler(handler::createPointvente);
+    router.put("/api/pointventes/:id").handler(handler::updatePointvente);
+    router.delete("/api/pointventes/:id").handler(handler::deletePointvente);
+
+    // Company relations
+    router.get("/api/pointventes/:id/compagnies").handler(handler::getCompagniesForPointvente);
+    router.post("/api/pointventes/:id/compagnies").handler(handler::linkCompagnieToPointvente);
+
+    // Relation management
+    router.put("/api/relations/:relationId/status").handler(handler::updateRelationStatus);
+    router.get("/api/relations/:relationId/historique").handler(handler::getHistoriqueForRelation);
+    router.get("/api/relations/:relationId").handler(handler::getRelationDetails);
   }
 
 

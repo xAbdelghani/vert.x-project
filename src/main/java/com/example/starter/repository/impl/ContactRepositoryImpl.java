@@ -228,7 +228,8 @@ public class ContactRepositoryImpl implements ContactRepository {
     } catch (Exception e) {
       // Column doesn't exist in this query
     }
-
     return contact;
   }
+
+
 }

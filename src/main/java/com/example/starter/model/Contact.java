@@ -16,7 +16,6 @@ public class Contact {
   private String remarquec;
   private Long compagnieId;
   private Long fonctionId;
-
   // Related entities - loaded on demand
   private Compagnie compagnie;
   private Fonction fonction;

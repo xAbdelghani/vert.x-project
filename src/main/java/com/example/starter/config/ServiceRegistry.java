@@ -1,16 +1,10 @@
 package com.example.starter.config;
 
 import com.example.starter.handler.*;
-import com.example.starter.repository.AgenceRepository;
-import com.example.starter.repository.ContactRepository;
-import com.example.starter.repository.FonctionRepository;
-import com.example.starter.repository.UserRepository;
+import com.example.starter.repository.*;
 import com.example.starter.repository.impl.*;
 import com.example.starter.service.*;
-import com.example.starter.service.impl.AgenceServiceImpl;
-import com.example.starter.service.impl.ContactServiceImpl;
-import com.example.starter.service.impl.FonctionServiceImpl;
-import com.example.starter.service.impl.UserServiceImpl;
+import com.example.starter.service.impl.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
@@ -63,6 +57,10 @@ public class ServiceRegistry {
     repositories.put("agenceRepository", new AgenceRepositoryImpl(pgPool));
     repositories.put("fonctionRepository", new FonctionRepositoryImpl(pgPool));
     repositories.put("contactRepository", new ContactRepositoryImpl(pgPool));
+    repositories.put("pointventeRepository", new PointventeRepositoryImpl(pgPool));
+    repositories.put("relationPointventeCompagnieRepository", new RelationPointventeCompagnieRepositoryImpl(pgPool));
+    repositories.put("statutCRepository", new StatutCRepositoryImpl(pgPool));
+    repositories.put("statutHistoriqueCRepository", new StatutHistoriqueCRepositoryImpl(pgPool));
   }
 
 
@@ -114,6 +112,25 @@ public class ServiceRegistry {
     services.put("agenceService", agenceService);
 
 
+    PointventeService pointventeService = new PointventeServiceImpl(
+      getRepository("pointventeRepository", PointventeRepository.class),
+      getRepository("relationPointventeCompagnieRepository", RelationPointventeCompagnieRepository.class),
+      getRepository("statutCRepository", StatutCRepository.class),
+      getRepository("statutHistoriqueCRepository", StatutHistoriqueCRepository.class)
+    );
+    services.put("pointventeService", pointventeService);
+
+
+    RelationPointventeCompagnieService relationService = new RelationPointventeCompagnieServiceImpl(
+      getRepository("relationPointventeCompagnieRepository", RelationPointventeCompagnieRepository.class),
+      getRepository("pointventeRepository", PointventeRepository.class),
+      getRepository("compagnieRepository", CompagnieRepositoryImpl.class),
+      getRepository("statutCRepository", StatutCRepository.class),
+      getRepository("statutHistoriqueCRepository", StatutHistoriqueCRepository.class)
+    );
+    services.put("relationPointventeCompagnieService", relationService);
+
+
   }
 
 
@@ -141,6 +158,11 @@ public class ServiceRegistry {
     // Handler for compagnie registration
     handlers.put("compagnieRegistrationHandler", new CompagnieHandler(
       getService("compagnieRegistrationService", CompagnieRegistrationService.class)
+    ));
+
+    handlers.put("pointventeHandler", new PointventeHandler(
+      getService("pointventeService", PointventeService.class),
+      getService("relationPointventeCompagnieService", RelationPointventeCompagnieService.class)
     ));
   }
 

@@ -1,6 +1,5 @@
 package com.example.starter.config;
 
-
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mail.MailClient;
@@ -11,8 +10,6 @@ public class MailClientConfig {
 
     // Renamed class to avoid conflict
   public static MailClient create(Vertx vertx, JsonObject config) {
-
-    // Now using Vert.x's MailConfig without naming conflict
 
     MailConfig mailConfig = new MailConfig()
       .setHostname(config.getString("host", "smtp.gmail.com"))

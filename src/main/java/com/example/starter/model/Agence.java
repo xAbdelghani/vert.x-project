@@ -25,4 +25,5 @@ public class Agence {
   private String compagnieRaisonSocial;
 
   public Agence() {}
+
 }

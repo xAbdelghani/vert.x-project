@@ -1,6 +1,5 @@
 package com.example.starter;
 
-
 import com.example.starter.verticle.MainVerticle;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.vertx.core.DeploymentOptions;
