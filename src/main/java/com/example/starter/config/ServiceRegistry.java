@@ -126,7 +126,8 @@ public class ServiceRegistry {
       getRepository("pointventeRepository", PointventeRepository.class),
       getRepository("compagnieRepository", CompagnieRepositoryImpl.class),
       getRepository("statutCRepository", StatutCRepository.class),
-      getRepository("statutHistoriqueCRepository", StatutHistoriqueCRepository.class)
+      getRepository("statutHistoriqueCRepository", StatutHistoriqueCRepository.class),
+      pgPool
     );
     services.put("relationPointventeCompagnieService", relationService);
 

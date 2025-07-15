@@ -9,4 +9,6 @@ public interface StatutHistoriqueCRepository {
   Future<Long> save(StatutHistoriqueC historique);
   Future<List<StatutHistoriqueC>> findByRelationId(Long relationId);
   Future<StatutHistoriqueC> getCurrentStatus(Long relationId);
+  Future<Void> deleteByRelationId(Long relationId);
+
 }

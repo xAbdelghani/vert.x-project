@@ -9,4 +9,5 @@ public interface RelationPointventeCompagnieService {
   Future<Void> updateRelationStatus(Long relationId, String status, String reason);
   Future<JsonArray> getHistoriqueForRelation(Long relationId);
   Future<JsonObject> getRelationDetails(Long relationId);
+  Future<Void> unlinkCompagnie(Long relationId);
 }

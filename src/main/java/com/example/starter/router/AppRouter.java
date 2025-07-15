@@ -155,8 +155,10 @@ public class AppRouter {
     // Relation management
     router.put("/api/relations/:relationId/status").handler(handler::updateRelationStatus);
     router.get("/api/relations/:relationId/historique").handler(handler::getHistoriqueForRelation);
-    router.get("/api/relations/:relationId").handler(handler::getRelationDetails);
+    // router.get("/api/relations/:relationId").handler(handler::getRelationDetails);
+    router.delete("/api/relations/:relationId").handler(handler::unlinkCompagnie);
   }
+
 
 
 }

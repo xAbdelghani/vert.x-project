@@ -13,4 +13,5 @@ public interface RelationPointventeCompagnieRepository {
   Future<RelationPointventeCompagnie> findByPointventeAndCompagnie(Long pointventeId, Long compagnieId);
   Future<Void> updateStatus(Long id, String status, String reason);
   Future<Boolean> exists(Long pointventeId, Long compagnieId);
+  Future<Void> delete(Long id);
 }

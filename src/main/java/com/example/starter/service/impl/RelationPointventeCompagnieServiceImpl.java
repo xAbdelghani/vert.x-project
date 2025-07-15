@@ -9,29 +9,39 @@ import com.example.starter.repository.StatutCRepository;
 import com.example.starter.repository.StatutHistoriqueCRepository;
 import com.example.starter.repository.impl.CompagnieRepositoryImpl;
 import com.example.starter.service.RelationPointventeCompagnieService;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RelationPointventeCompagnieServiceImpl implements RelationPointventeCompagnieService {
+
   private final RelationPointventeCompagnieRepository relationRepository;
   private final PointventeRepository pointventeRepository;
   private final CompagnieRepositoryImpl compagnieRepository;
   private final StatutCRepository statutCRepository;
   private final StatutHistoriqueCRepository historiqueRepository;
+  private final PgPool pgPool;
 
   public RelationPointventeCompagnieServiceImpl(
     RelationPointventeCompagnieRepository relationRepository,
     PointventeRepository pointventeRepository,
     CompagnieRepositoryImpl compagnieRepository,
     StatutCRepository statutCRepository,
-    StatutHistoriqueCRepository historiqueRepository
+    StatutHistoriqueCRepository historiqueRepository,
+    PgPool pgPool
   ) {
     this.relationRepository = relationRepository;
     this.pointventeRepository = pointventeRepository;
     this.compagnieRepository = compagnieRepository;
     this.statutCRepository = statutCRepository;
     this.historiqueRepository = historiqueRepository;
+    this.pgPool=pgPool;
   }
 
   @Override
@@ -167,6 +177,40 @@ public class RelationPointventeCompagnieServiceImpl implements RelationPointvent
           });
       });
   }
+
+  @Override
+  public Future<Void> unlinkCompagnie(Long relationId) {
+    // First get all history IDs for this relation
+    String getHistoryIdsSql = """
+            SELECT id FROM statut_historiquec WHERE relation_id = $1
+        """;
+
+    return pgPool.preparedQuery(getHistoryIdsSql)
+      .execute(Tuple.of(relationId))
+      .compose(rows -> {
+        // Delete history entries one by one (to avoid foreign key issues)
+        List<Future> deleteFutures = new ArrayList<>();
+        rows.forEach(row -> {
+          String deleteHistorySql = """
+                        DELETE FROM statut_historiquec WHERE id = $1
+                    """;
+          deleteFutures.add(
+            pgPool.preparedQuery(deleteHistorySql)
+              .execute(Tuple.of(row.getLong("id")))
+          );
+        });
+
+        if (deleteFutures.isEmpty()) {
+          return Future.succeededFuture();
+        }
+        return CompositeFuture.all(deleteFutures);
+      })
+      .compose(v -> {
+        // Now delete the relation itself
+        return relationRepository.delete(relationId);
+      });
+  }
+
 
   private JsonObject relationToJson(RelationPointventeCompagnie relation) {
     JsonObject json = new JsonObject()

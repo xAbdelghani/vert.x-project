@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatutHistoriqueCRepositoryImpl implements StatutHistoriqueCRepository {
+
   private final PgPool pgPool;
 
   public StatutHistoriqueCRepositoryImpl(PgPool pgPool) {
@@ -107,5 +108,15 @@ public class StatutHistoriqueCRepositoryImpl implements StatutHistoriqueCReposit
     }
 
     return historique;
+  }
+
+
+  @Override
+  public Future<Void> deleteByRelationId(Long relationId) {
+    String sql = "DELETE FROM statut_historiquec WHERE relation_id = $1";
+
+    return pgPool.preparedQuery(sql)
+      .execute(Tuple.of(relationId))
+      .map(rows -> null);
   }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RelationPointventeCompagnieRepositoryImpl implements RelationPointventeCompagnieRepository {
+
   private final PgPool pgPool;
 
   public RelationPointventeCompagnieRepositoryImpl(PgPool pgPool) {
@@ -198,4 +199,18 @@ public class RelationPointventeCompagnieRepositoryImpl implements RelationPointv
 
     return relation;
   }
+
+  @Override
+  public Future<Void> delete(Long id) {
+    String sql = """
+            DELETE FROM relationpointventecompagnie WHERE id = $1
+        """;
+    return pgPool.preparedQuery(sql)
+      .execute(Tuple.of(id))
+      .map(rows -> null);
+  }
+
+
+
+
 }

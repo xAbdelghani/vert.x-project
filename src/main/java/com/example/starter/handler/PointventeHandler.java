@@ -182,16 +182,16 @@ public class PointventeHandler {
         .end(new JsonObject().put("error", err.getMessage()).encode()));
   }
 
-  // GET /api/relations/:relationId
-  public void getRelationDetails(RoutingContext ctx) {
+  // DELETE /api/relations/:relationId
+  public void unlinkCompagnie(RoutingContext ctx) {
     Long relationId = Long.parseLong(ctx.pathParam("relationId"));
 
-    relationService.getRelationDetails(relationId)
-      .onSuccess(relation -> ctx.response()
-        .putHeader("content-type", "application/json")
-        .end(relation.encode()))
+    relationService.unlinkCompagnie(relationId)
+      .onSuccess(v -> ctx.response()
+        .setStatusCode(204)
+        .end())
       .onFailure(err -> ctx.response()
-        .setStatusCode(404)
+        .setStatusCode(500)
         .putHeader("content-type", "application/json")
         .end(new JsonObject().put("error", err.getMessage()).encode()));
   }

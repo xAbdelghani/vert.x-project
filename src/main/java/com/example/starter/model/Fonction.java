@@ -10,7 +10,6 @@ import java.util.List;
 public class Fonction {
   private Long id;
   private String qualite;
-
   // Relationships - loaded on demand
   private List<Contact> contacts;
 }
