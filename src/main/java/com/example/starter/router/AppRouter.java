@@ -53,7 +53,10 @@ public class AppRouter {
     mountFonctionRoutes(router);
     mountContactRoutes(router);
     mountPointventeRoutes(router);
-
+    mountBalanceRoutes(router);
+    mountTypeAbonnementRoutes( router);
+    mountSubscriptionRoutes(router);
+    mountPrepayeRoutes(router);
     return router;
   }
 
@@ -137,10 +140,8 @@ public class AppRouter {
     router.get("/api/compagnies/:compagnieId/contacts").handler(handler::getContactsByCompagnie);
   }
 
-
   private void mountPointventeRoutes(Router router) {
     PointventeHandler handler = registry.getHandler("pointventeHandler", PointventeHandler.class);
-
     // Pointvente CRUD
     router.get("/api/pointventes").handler(handler::getAllPointventes);
     router.get("/api/pointventes/:id").handler(handler::getPointvente);
@@ -157,6 +158,68 @@ public class AppRouter {
     router.get("/api/relations/:relationId/historique").handler(handler::getHistoriqueForRelation);
     // router.get("/api/relations/:relationId").handler(handler::getRelationDetails);
     router.delete("/api/relations/:relationId").handler(handler::unlinkCompagnie);
+  }
+
+  private void mountBalanceRoutes(Router router) {
+    BalanceHandler handler = registry.getHandler("balanceHandler", BalanceHandler.class);
+    // Balance management
+    router.get("/api/balances").handler(handler::getAllBalances);
+    router.get("/api/companies/:id/balance").handler(handler::getCompanyBalance);
+    router.post("/api/companies/:id/balance/credit").handler(handler::addCredit);
+    router.post("/api/companies/:id/balance/debit").handler(handler::deductCredit);
+    router.get("/api/companies/:id/transactions").handler(handler::getTransactionHistory);
+    router.post("/api/companies/:id/balance/initialize").handler(handler::initializeBalance);
+    router.get("/api/balances/low").handler(handler::getLowBalances);
+  }
+
+  private void mountPrepayeRoutes(Router router) {
+    PrepayeHandler prepayeHandler = registry.getHandler("prepayeHandler", PrepayeHandler.class);
+
+    router.get("/api/prepaye/balances").handler(prepayeHandler::getAllPrepayeBalances);
+    router.get("/api/prepaye/companies/:id/balance").handler(prepayeHandler::getPrepayeBalance);
+    router.post("/api/prepaye/companies/:id/initialize").handler(prepayeHandler::initializePrepaye);
+    router.post("/api/prepaye/companies/:id/credit").handler(prepayeHandler::addCredit);
+    router.post("/api/prepaye/companies/:id/debit").handler(prepayeHandler::deductCredit);
+    router.get("/api/prepaye/companies/:id/transactions").handler(prepayeHandler::getTransactionHistory);
+    router.get("/api/prepaye/balances/low").handler(prepayeHandler::getLowBalances);
+    router.post("/api/prepaye/companies/:id/attestation-payment").handler(prepayeHandler::processAttestationPayment);
+
+  }
+
+  private void mountTypeAbonnementRoutes(Router router) {
+    TypeAbonnementHandler handler = registry.getHandler("typeAbonnementHandler", TypeAbonnementHandler.class);
+    //
+    router.get("/api/abonnement-types").handler(handler::getAllTypes);
+    router.get("/api/abonnement-types/active").handler(handler::getActiveTypes);
+    router.get("/api/abonnement-types/:id").handler(handler::getType);
+    router.get("/api/abonnement-types/categorie/:categorie").handler(handler::getTypesByCategorie);
+    router.post("/api/abonnement-types").handler(handler::createType);
+    router.put("/api/abonnement-types/:id").handler(handler::updateType);
+    router.delete("/api/abonnement-types/:id").handler(handler::deleteType);
+  }
+
+  private void mountSubscriptionRoutes(Router router) {
+    SubscriptionHandler handler = registry.getHandler("subscriptionHandler", SubscriptionHandler.class);
+    // Existing routes
+    router.post("/api/subscriptions").handler(handler::createSubscription);
+    router.get("/api/companies/:id/subscription").handler(handler::getCompanySubscription);
+    router.get("/api/subscriptions").handler(handler::getAllSubscriptions);
+    router.get("/api/subscriptions/category/:category").handler(handler::getSubscriptionsByCategory);
+    router.put("/api/subscriptions/:id").handler(handler::updateSubscription);
+
+    // B) Status Management Routes
+    router.get("/api/subscription-statuses").handler(handler::getAvailableStatuses);
+    router.put("/api/subscriptions/:id/status").handler(handler::changeStatus);
+    router.put("/api/subscriptions/:id/suspend").handler(handler::suspendSubscription);
+    router.put("/api/subscriptions/:id/reactivate").handler(handler::reactivateSubscription);
+
+    // C) Credit Management Routes (AVANCE)
+    router.get("/api/companies/:id/credit-usage").handler(handler::getCreditUsage);
+    router.post("/api/companies/:id/use-credit").handler(handler::useCredit);
+
+    // D) Deposit Management Routes (CAUTION)
+    router.get("/api/companies/:id/deposit-status").handler(handler::getDepositStatus);
+    router.post("/api/companies/:id/use-deposit").handler(handler::useDeposit);
   }
 
 

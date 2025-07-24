@@ -44,6 +44,7 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
       .mapEmpty();
   }
 
+
   // Find a compagnie by ID
   public Future<Compagnie> findById(Long id) {
     String sql = "SELECT * FROM compagnies WHERE id = $1";
@@ -52,6 +53,8 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
       .execute(Tuple.of(id))
       .map(rows -> rows.iterator().hasNext() ? mapRow(rows.iterator().next()) : null);
   }
+
+
 
   // Optional: Find by email
   public Future<Compagnie> findByEmail(String email) {
@@ -62,6 +65,9 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
       .execute(Tuple.of(email))
       .map(rows -> rows.iterator().hasNext() ? mapRow(rows.iterator().next()) : null);
   }
+
+
+
 
   public Future<List<Compagnie>> findAll() {
     String sql = "SELECT * FROM compagnies";
@@ -77,6 +83,8 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
       });
   }
 
+
+
   // Delete a compagnie by ID
   public Future<Void> deleteById(Long id) {
     String sql = "DELETE FROM compagnies WHERE id = $1";
@@ -84,6 +92,8 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
       .execute(Tuple.of(id))
       .mapEmpty();
   }
+
+
 
   // Mapping method
   private Compagnie mapRow(Row row) {
@@ -101,9 +111,5 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
     );
     return compagnie;
   }
-
-
-
-
 
 }

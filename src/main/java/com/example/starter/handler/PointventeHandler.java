@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 public class PointventeHandler {
+
   private final PointventeService pointventeService;
   private final RelationPointventeCompagnieService relationService;
 
@@ -195,4 +196,6 @@ public class PointventeHandler {
         .putHeader("content-type", "application/json")
         .end(new JsonObject().put("error", err.getMessage()).encode()));
   }
+
+
 }

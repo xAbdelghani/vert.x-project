@@ -70,7 +70,6 @@ public class AgenceRepositoryImpl implements AgenceRepository {
             LEFT JOIN compagnies c ON a.compagnie_id = c.id
             WHERE a.id = $1
             """;
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(id))
       .map(rows -> {
@@ -88,7 +87,6 @@ public class AgenceRepositoryImpl implements AgenceRepository {
             WHERE a.compagnie_id = $1
             ORDER BY a.id DESC
             """;
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(compagnieId))
       .map(this::mapRowsWithCompagnie);
@@ -103,7 +101,6 @@ public class AgenceRepositoryImpl implements AgenceRepository {
             WHERE a.status = $1
             ORDER BY a.id DESC
             """;
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(status))
       .map(this::mapRowsWithCompagnie);
@@ -150,9 +147,7 @@ public class AgenceRepositoryImpl implements AgenceRepository {
             SET date_fina = $2, status = 'CLOTURE'
             WHERE id = $1
             """;
-
     Tuple params = Tuple.of(id, LocalDate.now());
-
     return pgPool.preparedQuery(sql)
       .execute(params)
       .map(result -> result.rowCount() > 0);
@@ -161,7 +156,6 @@ public class AgenceRepositoryImpl implements AgenceRepository {
   @Override
   public Future<Boolean> deleteById(Long id) {
     String sql = "DELETE FROM agence WHERE id = $1";
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(id))
       .map(result -> result.rowCount() > 0);

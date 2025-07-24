@@ -14,11 +14,13 @@ public class Application {
     System.out.println(">>> Application started");
     Vertx vertx = Vertx.vertx();
     JsonObject config = new JsonObject()
-      .put("http", new JsonObject().put("port", 8080))
+      .put("http", new JsonObject()
+        .put("port", 8080))
       .put("database", new JsonObject()
         .put("host", "localhost")
         .put("port", 5432)
-        .put("database", "vertxData")
+       // .put("database", "vertxData")
+        .put("database", "testVertx")
         .put("user", "postgres")
         .put("password", "user"))
       .put("keycloak", new JsonObject()

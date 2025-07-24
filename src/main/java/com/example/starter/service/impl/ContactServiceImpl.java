@@ -13,6 +13,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.NoSuchElementException;
 
 public class ContactServiceImpl implements ContactService {
+
   private final ContactRepository contactRepository;
   private final CompagnieRepositoryImpl compagnieRepository;
   private final FonctionRepository fonctionRepository;

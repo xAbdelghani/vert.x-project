@@ -24,7 +24,8 @@ public class ServiceRegistry {
   private final JsonObject config;
   private final Vertx vertx;
 
-  public ServiceRegistry(PgPool pgPool, OAuth2Auth oauth2Auth, JsonObject config, Vertx vertx) {
+  public ServiceRegistry(PgPool pgPool, OAuth2Auth oauth2Auth,
+                         JsonObject config, Vertx vertx) {
     this.vertx = vertx;
     this.config = config;
     this.pgPool = pgPool;
@@ -52,6 +53,10 @@ public class ServiceRegistry {
 
 
   private void initRepositories() {
+    repositories.put("typeAbonnementRepository", new TypeAbonnementRepositoryImpl(pgPool));
+    repositories.put("abonnementRepository", new AbonnementRepositoryImpl(pgPool));
+    repositories.put("soldePrePayeRepository", new SoldePrePayeRepositoryImpl(pgPool));
+    repositories.put("transactionRepository", new TransactionRepositoryImpl(pgPool));
     repositories.put("userRepository", new UserRepositoryImpl(pgPool));
     repositories.put("compagnieRepository", new CompagnieRepositoryImpl(pgPool));
     repositories.put("agenceRepository", new AgenceRepositoryImpl(pgPool));
@@ -65,6 +70,37 @@ public class ServiceRegistry {
 
 
   private void initBusinessServices() {
+
+    PrepayeService prepayeService = new PrepayeServiceImpl(
+      getRepository("soldePrePayeRepository", SoldePrePayeRepository.class),
+      getRepository("transactionRepository", TransactionRepository.class),
+      (CompagnieRepositoryImpl) getRepository("compagnieRepository", CompagnieRepository.class)
+    );
+    services.put("prepayeService", prepayeService);
+
+
+    SubscriptionService subscriptionService = new SubscriptionServiceImpl(pgPool,
+      getRepository("abonnementRepository", AbonnementRepository.class),
+      getRepository("typeAbonnementRepository", TypeAbonnementRepository.class),
+      getRepository("soldePrePayeRepository", SoldePrePayeRepository.class),
+      getRepository("transactionRepository", TransactionRepository.class)
+    );
+    services.put("subscriptionService", subscriptionService);
+
+    TypeAbonnementService typeAbonnementService = new TypeAbonnementServiceImpl(
+      getRepository("typeAbonnementRepository", TypeAbonnementRepository.class)
+    );
+    services.put("typeAbonnementService", typeAbonnementService);
+
+
+    BalanceService balanceService = new BalanceServiceImpl(
+      getRepository("soldePrePayeRepository", SoldePrePayeRepository.class),
+      getRepository("abonnementRepository", AbonnementRepository.class),
+      getRepository("typeAbonnementRepository", TypeAbonnementRepository.class),
+      getRepository("transactionRepository", TransactionRepository.class),
+      getRepository("compagnieRepository", CompagnieRepositoryImpl.class)
+    );
+    services.put("balanceService", balanceService);
 
     // User service
     UserService userService = new UserServiceImpl(
@@ -136,6 +172,22 @@ public class ServiceRegistry {
 
 
   private void initHandlers() {
+    handlers.put("prepayeHandler", new PrepayeHandler(
+      getService("prepayeService", PrepayeService.class)));
+
+
+    handlers.put("subscriptionHandler", new SubscriptionHandler(
+      getService("subscriptionService", SubscriptionService.class)
+    ));
+
+    handlers.put("typeAbonnementHandler", new TypeAbonnementHandler(
+      getService("typeAbonnementService", TypeAbonnementService.class)
+    ));
+
+    handlers.put("balanceHandler", new BalanceHandler(
+      getService("prepayeService", PrepayeService.class),
+       getService("balanceService", BalanceService.class)
+    ));
 
     handlers.put("fonctionHandler", new FonctionHandler(
       getService("fonctionService", FonctionService.class)
@@ -165,6 +217,7 @@ public class ServiceRegistry {
       getService("pointventeService", PointventeService.class),
       getService("relationPointventeCompagnieService", RelationPointventeCompagnieService.class)
     ));
+
   }
 
   // Type-safe getters

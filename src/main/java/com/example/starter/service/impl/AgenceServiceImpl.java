@@ -14,6 +14,7 @@ import java.util.List;
 public class AgenceServiceImpl implements AgenceService {
 
   private final AgenceRepository agenceRepository;
+
   private final CompagnieRepository compagnieRepository;
 
   public AgenceServiceImpl(AgenceRepository agenceRepository,
@@ -34,7 +35,6 @@ public class AgenceServiceImpl implements AgenceService {
             new Exception("Compagnie not found with id: " + request.getCompagnieId())
           );
         }
-
         Agence agence = new Agence();
         agence.setNoma(request.getNoma());
         agence.setAdressea(request.getAdressea());

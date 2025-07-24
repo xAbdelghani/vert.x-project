@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class StatutHistoriqueC {
+
   private Long id;
   private Long relationId;
   private Long idStatutc;
@@ -18,4 +19,5 @@ public class StatutHistoriqueC {
   private String statut;
   // Related entity
   private StatutC statutC;
+
 }

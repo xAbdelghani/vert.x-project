@@ -15,9 +15,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Tuple;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class RelationPointventeCompagnieServiceImpl implements RelationPointventeCompagnieService {
 

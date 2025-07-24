@@ -65,6 +65,7 @@ public class UserHandler {
       .onFailure(err -> ctx.response().setStatusCode(500).end());
   }
 
+
   public void deleteUser(RoutingContext ctx) {
     Long id = Long.parseLong(ctx.pathParam("id"));
 
