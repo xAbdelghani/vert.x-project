@@ -17,4 +17,5 @@ public interface AgenceService {
   Future<Agence> update(Long id, UpdateAgenceRequest request);
   Future<Boolean> closeAgence(Long id);
   Future<Boolean> delete(Long id);
+
 }

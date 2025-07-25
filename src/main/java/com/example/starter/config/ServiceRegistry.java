@@ -53,6 +53,8 @@ public class ServiceRegistry {
 
 
   private void initRepositories() {
+    repositories.put("typeAttestationRepository", new TypeAttestationRepositoryImpl(pgPool));
+    repositories.put("attestationAutoriserRepository", new AttestationAutoriserRepositoryImpl(pgPool));
     repositories.put("typeAbonnementRepository", new TypeAbonnementRepositoryImpl(pgPool));
     repositories.put("abonnementRepository", new AbonnementRepositoryImpl(pgPool));
     repositories.put("soldePrePayeRepository", new SoldePrePayeRepositoryImpl(pgPool));
@@ -70,6 +72,13 @@ public class ServiceRegistry {
 
 
   private void initBusinessServices() {
+
+    TypeAttestationService typeAttestationService = new TypeAttestationServiceImpl(
+      getRepository("typeAttestationRepository", TypeAttestationRepository.class),
+      getRepository("attestationAutoriserRepository", AttestationAutoriserRepository.class),
+      getRepository("compagnieRepository", CompagnieRepository.class)
+    );
+    services.put("typeAttestationService", typeAttestationService);
 
     PrepayeService prepayeService = new PrepayeServiceImpl(
       getRepository("soldePrePayeRepository", SoldePrePayeRepository.class),
@@ -172,9 +181,13 @@ public class ServiceRegistry {
 
 
   private void initHandlers() {
+
+    handlers.put("typeAttestationHandler", new TypeAttestationHandler(
+      getService("typeAttestationService", TypeAttestationService.class)
+    ));
+
     handlers.put("prepayeHandler", new PrepayeHandler(
       getService("prepayeService", PrepayeService.class)));
-
 
     handlers.put("subscriptionHandler", new SubscriptionHandler(
       getService("subscriptionService", SubscriptionService.class)

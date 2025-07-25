@@ -46,7 +46,7 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
 
 
   // Find a compagnie by ID
-  public Future<Compagnie> findById(Long id) {
+  public Future<Compagnie>  findById(Long id) {
     String sql = "SELECT * FROM compagnies WHERE id = $1";
 
     return pgPool.preparedQuery(sql)

@@ -31,6 +31,7 @@ public class AppRouter {
         .allowedMethod(HttpMethod.DELETE)
         .allowedMethod(HttpMethod.OPTIONS)
         .allowedMethod(HttpMethod.PATCH)
+        .allowedMethod(HttpMethod.HEAD)
         .allowedHeader("Authorization")
         .allowedHeader("Content-Type")
         .allowedHeader("Access-Control-Allow-Origin")
@@ -46,20 +47,50 @@ public class AppRouter {
     router.route("/*").handler(policyEnforcer);
     // Mount all entity routes
     mountUserRoutes(router);
-    //mountCreateRegister(router);
     mountCompagnieRegister(router);
     mountAgenceRoutes(router);
-
     mountFonctionRoutes(router);
     mountContactRoutes(router);
     mountPointventeRoutes(router);
     mountBalanceRoutes(router);
-    mountTypeAbonnementRoutes( router);
+    mountTypeAbonnementRoutes(router);
     mountSubscriptionRoutes(router);
     mountPrepayeRoutes(router);
+    mountTypeAttestationRoutes(router);
+
     return router;
+
   }
 
+
+  private void mountTypeAttestationRoutes(Router router) {
+
+    TypeAttestationHandler handler = registry.getHandler("typeAttestationHandler", TypeAttestationHandler.class);
+
+    // Type Attestation CRUD
+    router.post("/api/type-attestations").handler(ctx -> handler.createType(ctx));
+    router.get("/api/type-attestations").handler(handler::getAllTypes);
+    router.get("/api/type-attestations/:id").handler(handler::getType);
+    router.put("/api/type-attestations/:id").handler(handler::updateType);
+    router.delete("/api/type-attestations/:id").handler(handler::deleteType);
+
+    // Authorization Management
+    router.post("/api/companies/:companyId/authorize-attestation/:typeId")
+      .handler(handler::authorizeCompany);
+
+    router.delete("/api/companies/:companyId/authorize-attestation/:typeId")
+      .handler(handler::unauthorizeCompany);
+
+    router.get("/api/companies/:id/authorized-attestations")
+      .handler(handler::getCompanyAuthorizations);
+    // Authorization Matrix
+    router.get("/api/authorization-matrix").handler(handler::getAuthorizationMatrix);
+    router.put("/api/authorization-matrix").handler(handler::updateAuthorizationMatrix);
+
+    // Check Authorization
+    router.get("/api/companies/:id/can-generate/:typeId")
+      .handler(handler::checkAuthorization);
+  }
   private void mountUserRoutes(Router router) {
     var handler = registry.getHandler("user", UserHandler.class);
     router.get("/users").handler(ctx -> handler.getAllUsers(ctx));
@@ -102,7 +133,6 @@ public class AppRouter {
   }
 
   private void mountAgenceRoutes(Router router) {
-
     AgenceHandler handler = registry.getHandler("agenceHandler", AgenceHandler.class);
     // CRUD routes
     router.get("/api/agences").handler(handler::getAll);
@@ -199,6 +229,7 @@ public class AppRouter {
   }
 
   private void mountSubscriptionRoutes(Router router) {
+
     SubscriptionHandler handler = registry.getHandler("subscriptionHandler", SubscriptionHandler.class);
     // Existing routes
     router.post("/api/subscriptions").handler(handler::createSubscription);
@@ -206,20 +237,18 @@ public class AppRouter {
     router.get("/api/subscriptions").handler(handler::getAllSubscriptions);
     router.get("/api/subscriptions/category/:category").handler(handler::getSubscriptionsByCategory);
     router.put("/api/subscriptions/:id").handler(handler::updateSubscription);
-
     // B) Status Management Routes
     router.get("/api/subscription-statuses").handler(handler::getAvailableStatuses);
     router.put("/api/subscriptions/:id/status").handler(handler::changeStatus);
     router.put("/api/subscriptions/:id/suspend").handler(handler::suspendSubscription);
     router.put("/api/subscriptions/:id/reactivate").handler(handler::reactivateSubscription);
-
     // C) Credit Management Routes (AVANCE)
     router.get("/api/companies/:id/credit-usage").handler(handler::getCreditUsage);
     router.post("/api/companies/:id/use-credit").handler(handler::useCredit);
-
     // D) Deposit Management Routes (CAUTION)
     router.get("/api/companies/:id/deposit-status").handler(handler::getDepositStatus);
     router.post("/api/companies/:id/use-deposit").handler(handler::useDeposit);
+
   }
 
 

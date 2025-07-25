@@ -8,7 +8,6 @@ import com.example.starter.repository.CompagnieRepository;
 import com.example.starter.service.AgenceService;
 import io.vertx.core.Future;
 import jakarta.ws.rs.NotFoundException;
-
 import java.util.List;
 
 public class AgenceServiceImpl implements AgenceService {

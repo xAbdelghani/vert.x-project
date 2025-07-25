@@ -51,6 +51,7 @@ public class AbonnementStatus {
   );
 
   public static StatusInfo getStatusInfo(String status) {
+
     switch (status) {
       case ACTIF: return ACTIF_INFO;
       case SUSPENDU: return SUSPENDU_INFO;
@@ -58,6 +59,7 @@ public class AbonnementStatus {
       case RESILIE: return RESILIE_INFO;
       default: return null;
     }
+
   }
 
   public static boolean isValidStatus(String status) {

@@ -150,6 +150,8 @@ public class TypeAbonnementServiceImpl implements TypeAbonnementService {
       });
   }
 
+
+
   private JsonObject typeToJson(TypeAbonnement type) {
     JsonObject json = new JsonObject()
       .put("id", type.getId())
