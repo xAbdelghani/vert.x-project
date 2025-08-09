@@ -8,7 +8,6 @@ import io.vertx.core.Future;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
-
 import java.util.ArrayList;
 import java.util.List;
 

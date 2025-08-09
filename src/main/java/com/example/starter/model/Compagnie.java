@@ -25,7 +25,7 @@ public class Compagnie {
   private List<Agence> agences;
   private List<SoldePrepaye> soldePrepayes;
   private List<Attestation> attestations;
-  private List<AttestationsAutorisees> attestationsAutorisees;
+  private List<AttestationAutoriser> attestationsAutorisees;
   private List<Facture> factures;
   private List<Contact> contacts;
   private List<RelationPointventeCompagnie> relationPointventeCompagnies;

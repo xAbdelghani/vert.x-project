@@ -275,7 +275,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
       json.put("type_libelle", auth.getTypeAttestation().getLibelle())
         .put("prix_unitaire", auth.getTypeAttestation().getPrixUnitaire());
     }
-
     return json;
   }
+
 }

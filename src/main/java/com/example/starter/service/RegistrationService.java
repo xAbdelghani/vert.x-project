@@ -9,8 +9,6 @@ public class RegistrationService {
 
   private final EmailService emailService;
 
-
-
   public RegistrationService(KeycloakAdminService keycloakAdmin, EmailService emailService) {
     this.keycloakAdmin = keycloakAdmin;
     this.emailService = emailService;
@@ -51,4 +49,6 @@ public class RegistrationService {
   private boolean isValidEmail(String email) {
     return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
   }
+
+
 }

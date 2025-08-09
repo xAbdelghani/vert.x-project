@@ -11,8 +11,8 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
 
 public class KeycloakAdminService {
 
@@ -45,6 +45,11 @@ public class KeycloakAdminService {
       user.setLastName("company");
       user.setEnabled(true);
       user.setEmailVerified(userData.getBoolean("emailVerified", false));
+      Map<String, List<String>> attributes = new HashMap<>();
+      attributes.put("compagnieId", Collections.singletonList(String.valueOf(userData.getLong("compagnieId"))));
+      user.setAttributes(attributes);
+
+
 
       // Set required actions if present
       if (userData.containsKey("requiredActions")) {

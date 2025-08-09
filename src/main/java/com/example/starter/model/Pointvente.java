@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Pointvente {
+
   private Long id;
   private String nomp;
   private String emailp;
@@ -18,5 +19,6 @@ public class Pointvente {
 
   // Relationships - loaded on demand
   private List<RelationPointventeCompagnie> relations;
+
 }
 

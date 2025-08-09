@@ -51,7 +51,10 @@ public class CompagnieRegistrationService {
         .put("lastName", "Company")  // Simple fix
         .put("password", generatedPassword)
         .put("role", "client-abonnement")
+        .put("compagnieId", compagnieId)
         .put("requiredActions", new JsonArray());
+
+
 
       return keycloakAdminService.createUser(userData)
         .compose(keycloakId ->

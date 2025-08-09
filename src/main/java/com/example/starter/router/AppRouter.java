@@ -57,8 +57,36 @@ public class AppRouter {
     mountSubscriptionRoutes(router);
     mountPrepayeRoutes(router);
     mountTypeAttestationRoutes(router);
-
+    mountVehicleRoutes(router);
+    mountAttestationRoutes(router);
+    mountNotificationRoutes(router);
+    mountContactRoutesM(router);
     return router;
+
+  }
+
+
+
+  private void mountNotificationRoutes(Router router) {
+    NotificationHandler handler = registry.getHandler("notificationHandler", NotificationHandler.class);
+    // Notification routes
+    router.get("/api/notifications").handler(handler::getAllNotifications);
+    router.get("/api/notifications/unread-count").handler(handler::getUnreadCount);
+    router.get("/api/notifications/:id").handler(handler::getNotification);
+    router.get("/api/notifications/company/:companyId").handler(handler::getCompanyNotifications);
+    router.post("/api/notifications").handler(handler::createNotification);
+    router.post("/api/notifications/authorization-request").handler(handler::createAuthorizationRequest);
+    router.put("/api/notifications/:id/read").handler(handler::markAsRead);
+    router.put("/api/notifications/read-multiple").handler(handler::markMultipleAsRead);
+    router.delete("/api/notifications/:id").handler(handler::deleteNotification);
+  }
+
+  private void mountContactRoutesM(Router router) {
+    ContactMessageHandler contactMessageHandler = registry.
+      getHandler("ContactMessageHandler", ContactMessageHandler.class);
+    router.post("/api/contact/send-email")
+      .handler(BodyHandler.create())
+      .handler(contactMessageHandler::sendContactEmail);
 
   }
 
@@ -112,6 +140,7 @@ public class AppRouter {
   private void mountCompagnieRegister(Router router) {
 
     CompagnieHandler CompagnieHandler = registry.getHandler("compagnieRegistrationHandler", CompagnieHandler.class);
+
     router.post("/api/compagnies")
       .handler(ctx -> CompagnieHandler.createCompagnie(ctx));
 
@@ -120,7 +149,6 @@ public class AppRouter {
 
     router.get("/api/v1/compagnies")
       .handler(ctx -> CompagnieHandler.getAllCompagnies(ctx));
-
 
     router.post("/api/compagnies/:id/account")
       .handler(ctx -> CompagnieHandler.createAccount(ctx));
@@ -248,9 +276,85 @@ public class AppRouter {
     // D) Deposit Management Routes (CAUTION)
     router.get("/api/companies/:id/deposit-status").handler(handler::getDepositStatus);
     router.post("/api/companies/:id/use-deposit").handler(handler::useDeposit);
-
   }
 
+  private void mountVehicleRoutes(Router router) {
+
+    VehicleHandler handler = registry.getHandler("vehicleHandler", VehicleHandler.class);
+    // Vehicle Model Routes
+    // IMPORTANT: Static routes MUST come before dynamic routes with path parameters
+    // Static routes first
+    router.get("/api/vehicle-models/brands").handler(handler::getAllBrands);
+    router.get("/api/vehicle-models/types").handler(handler::getAllTypes);
+    router.get("/api/vehicle-models/search").handler(handler::searchModels);
+
+    // Then routes without parameters
+    router.post("/api/vehicle-models").handler(handler::createModel);
+    router.get("/api/vehicle-models").handler(handler::getAllModels);
+
+    // Finally, dynamic routes with path parameters
+    router.get("/api/vehicle-models/:id").handler(handler::getModel);
+    router.put("/api/vehicle-models/:id").handler(handler::updateModel);
+    router.delete("/api/vehicle-models/:id").handler(handler::deleteModel);
+
+    // Vehicle Routes
+    // Same principle: static routes before dynamic ones
+
+    // Static routes first
+    router.get("/api/vehicles/search").handler(handler::searchVehicles);
+    router.get("/api/vehicles/plate/:immatriculation").handler(handler::getVehicleByPlate);
+
+    // Then routes without parameters
+    router.post("/api/vehicles").handler(handler::registerVehicle);
+    router.get("/api/vehicles").handler(handler::getAllVehicles);
+
+    // Finally, dynamic routes with path parameters
+    router.get("/api/vehicles/:id").handler(handler::getVehicle);
+    router.put("/api/vehicles/:id").handler(handler::updateVehicle);
+    router.delete("/api/vehicles/:id").handler(handler::deleteVehicle);
+  }
+
+  // Add this method to your main application class where routes are configured:
+
+  private void mountAttestationRoutes(Router router) {
+    AttestationHandler handler = registry.getHandler("attestationHandler", AttestationHandler.class);
+
+    // Main attestation generation endpoint
+    router.post("/api/attestations/generate")
+      .handler(handler::generateAttestations);
+
+    // Get single attestation
+    router.get("/api/attestations/:id")
+      .handler(handler::getAttestation);
+
+    // Get attestation by reference
+    router.get("/api/attestations/reference/:reference")
+      .handler(handler::getAttestationByReference);
+
+    // Get company attestations
+    router.get("/api/companies/:id/attestations")
+      .handler(handler::getCompanyAttestations);
+
+    // Get vehicle attestations
+    router.get("/api/vehicles/:id/attestations")
+      .handler(handler::getVehicleAttestations);
+
+    // Cancel attestation
+    router.put("/api/attestations/:id/cancel")
+      .handler(handler::cancelAttestation);
+
+    // Get attestation PDF
+    router.get("/api/attestations/:id/pdf")
+      .handler(handler::getAttestationPDF);
+
+    // Verify attestation (public endpoint)
+    router.get("/api/attestations/verify/:reference")
+      .handler(handler::verifyAttestation);
+
+    // Expire attestations (for scheduled job or manual trigger)
+    router.post("/api/attestations/expire")
+      .handler(handler::expireAttestations);
+  }
 
 
 }

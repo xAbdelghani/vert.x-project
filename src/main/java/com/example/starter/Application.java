@@ -20,7 +20,7 @@ public class Application {
         .put("host", "localhost")
         .put("port", 5432)
        // .put("database", "vertxData")
-        .put("database", "testVertx")
+        .put("database", "test3")
         .put("user", "postgres")
         .put("password", "user"))
       .put("keycloak", new JsonObject()
@@ -48,6 +48,4 @@ public class Application {
         err.printStackTrace();
       });
   }
-
-
 }

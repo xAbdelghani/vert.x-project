@@ -32,6 +32,7 @@ public class FonctionRepositoryImpl implements FonctionRepository {
 
   @Override
   public Future<Fonction> findById(Long id) {
+
     String sql = """
             SELECT * FROM fonction WHERE id = $1
         """;
@@ -65,7 +66,6 @@ public class FonctionRepositoryImpl implements FonctionRepository {
             UPDATE fonction SET qualite = $1
             WHERE id = $2
         """;
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(qualite, id))
       .map(rows -> null);
@@ -76,7 +76,6 @@ public class FonctionRepositoryImpl implements FonctionRepository {
     String sql = """
             DELETE FROM fonction WHERE id = $1
         """;
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(id))
       .map(rows -> null);
@@ -87,7 +86,6 @@ public class FonctionRepositoryImpl implements FonctionRepository {
     String sql = """
             SELECT EXISTS(SELECT 1 FROM fonction WHERE id = $1)
         """;
-
     return pgPool.preparedQuery(sql)
       .execute(Tuple.of(id))
       .map(rows -> rows.iterator().next().getBoolean(0));
@@ -99,5 +97,7 @@ public class FonctionRepositoryImpl implements FonctionRepository {
     fonction.setQualite(row.getString("qualite"));
     return fonction;
   }
+
+
 
 }

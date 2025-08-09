@@ -26,9 +26,8 @@ public class PrepayeHandler {
   }
 
   // GET /api/prepaye/companies/:id/balance
-  public void getPrepayeBalance(RoutingContext ctx) {
+  public void getPrepayeBalance(RoutingContext ctx)   {
     Long compagnieId = Long.parseLong(ctx.pathParam("id"));
-
     prepayeService.getPrepayeBalance(compagnieId)
       .onSuccess(balance -> ctx.response()
         .putHeader("content-type", "application/json")
@@ -38,6 +37,7 @@ public class PrepayeHandler {
         .putHeader("content-type", "application/json")
         .end(new JsonObject().put("error", err.getMessage()).encode()));
   }
+
 
   // POST /api/prepaye/companies/:id/initialize
   public void initializePrepaye(RoutingContext ctx) {
@@ -139,4 +139,5 @@ public class PrepayeHandler {
         .putHeader("content-type", "application/json")
         .end(new JsonObject().put("error", err.getMessage()).encode()));
   }
+
 }

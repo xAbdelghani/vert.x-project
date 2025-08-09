@@ -53,6 +53,11 @@ public class ServiceRegistry {
 
 
   private void initRepositories() {
+    repositories.put("notificationRepository", new NotificationRepositoryImpl(pgPool));
+
+    repositories.put("attestationRepository", new AttestationRepositoryImpl(pgPool));
+    repositories.put("modeleVehiculeRepository", new ModeleVehiculeRepositoryImpl(pgPool));
+    repositories.put("vehiculeRepository", new VehiculeRepositoryImpl(pgPool));
     repositories.put("typeAttestationRepository", new TypeAttestationRepositoryImpl(pgPool));
     repositories.put("attestationAutoriserRepository", new AttestationAutoriserRepositoryImpl(pgPool));
     repositories.put("typeAbonnementRepository", new TypeAbonnementRepositoryImpl(pgPool));
@@ -73,6 +78,18 @@ public class ServiceRegistry {
 
   private void initBusinessServices() {
 
+    NotificationService notificationService = new NotificationServiceImpl(
+      getRepository("notificationRepository", NotificationRepository.class)
+    );
+    services.put("notificationService", notificationService);
+
+    // 1. First initialize services that don't depend on other services
+    VehicleService vehicleService = new VehicleServiceImpl(
+      getRepository("modeleVehiculeRepository", ModeleVehiculeRepository.class),
+      getRepository("vehiculeRepository", VehiculeRepository.class)
+    );
+    services.put("vehicleService", vehicleService);
+
     TypeAttestationService typeAttestationService = new TypeAttestationServiceImpl(
       getRepository("typeAttestationRepository", TypeAttestationRepository.class),
       getRepository("attestationAutoriserRepository", AttestationAutoriserRepository.class),
@@ -87,7 +104,6 @@ public class ServiceRegistry {
     );
     services.put("prepayeService", prepayeService);
 
-
     SubscriptionService subscriptionService = new SubscriptionServiceImpl(pgPool,
       getRepository("abonnementRepository", AbonnementRepository.class),
       getRepository("typeAbonnementRepository", TypeAbonnementRepository.class),
@@ -100,7 +116,6 @@ public class ServiceRegistry {
       getRepository("typeAbonnementRepository", TypeAbonnementRepository.class)
     );
     services.put("typeAbonnementService", typeAbonnementService);
-
 
     BalanceService balanceService = new BalanceServiceImpl(
       getRepository("soldePrePayeRepository", SoldePrePayeRepository.class),
@@ -130,16 +145,12 @@ public class ServiceRegistry {
     );
     services.put("contactService", contactService);
 
-
-
     // Registration service for regular users
     RegistrationService registrationService = new RegistrationService(
       getService("keycloakAdmin", KeycloakAdminService.class),
       getService("emailService", EmailService.class)
     );
     services.put("registrationService", registrationService);
-
-
 
     // Compagnie registration service
     CompagnieRegistrationService compagnieRegistrationService = new CompagnieRegistrationService(
@@ -149,13 +160,11 @@ public class ServiceRegistry {
     );
     services.put("compagnieRegistrationService", compagnieRegistrationService);
 
-
     AgenceService agenceService = new AgenceServiceImpl(
       getRepository("agenceRepository", AgenceRepository.class),
       getRepository("compagnieRepository", CompagnieRepositoryImpl.class)
     );
     services.put("agenceService", agenceService);
-
 
     PointventeService pointventeService = new PointventeServiceImpl(
       getRepository("pointventeRepository", PointventeRepository.class),
@@ -164,7 +173,6 @@ public class ServiceRegistry {
       getRepository("statutHistoriqueCRepository", StatutHistoriqueCRepository.class)
     );
     services.put("pointventeService", pointventeService);
-
 
     RelationPointventeCompagnieService relationService = new RelationPointventeCompagnieServiceImpl(
       getRepository("relationPointventeCompagnieRepository", RelationPointventeCompagnieRepository.class),
@@ -176,11 +184,48 @@ public class ServiceRegistry {
     );
     services.put("relationPointventeCompagnieService", relationService);
 
+    // 2. PDF Generation Service (depends on repositories only)
+    PDFGenerationService pdfGenerationService = new PDFGenerationServiceImpl(
+      (CompagnieRepositoryImpl) getRepository("compagnieRepository", CompagnieRepository.class),
+      getRepository("modeleVehiculeRepository", ModeleVehiculeRepository.class)
+    );
+    services.put("pdfGenerationService", pdfGenerationService);
+
+    // 3. LAST: Attestation Service (depends on multiple other services)
+    AttestationService attestationService = new AttestationServiceImpl(
+      pgPool,
+      getRepository("attestationRepository", AttestationRepository.class),
+      getRepository("vehiculeRepository", VehiculeRepository.class),
+      (CompagnieRepositoryImpl) getRepository("compagnieRepository", CompagnieRepository.class),
+      getRepository("typeAttestationRepository", TypeAttestationRepository.class),
+      getService("prepayeService", PrepayeService.class),
+      getService("subscriptionService", SubscriptionService.class),
+      getService("typeAttestationService", TypeAttestationService.class),
+      getService("pdfGenerationService", PDFGenerationService.class),
+      getRepository("transactionRepository", TransactionRepository.class)
+    );
+    services.put("attestationService", attestationService);
+
 
   }
 
 
   private void initHandlers() {
+
+    handlers.put("ContactMessageHandler", new ContactMessageHandler(
+      getService("emailService", EmailService.class),"aboumada.abdelghani@gmail.com"
+    ));
+
+    handlers.put("notificationHandler", new NotificationHandler(
+      getService("notificationService", NotificationService.class)));
+
+    handlers.put("attestationHandler", new AttestationHandler(
+      getService("attestationService", AttestationService.class)
+    ));
+
+    handlers.put("vehicleHandler", new VehicleHandler(
+      getService("vehicleService", VehicleService.class)
+    ));
 
     handlers.put("typeAttestationHandler", new TypeAttestationHandler(
       getService("typeAttestationService", TypeAttestationService.class)
@@ -252,6 +297,5 @@ public class ServiceRegistry {
   public OAuth2Auth getOAuth2Auth() {
     return oauth2Auth;
   }
-
 
 }

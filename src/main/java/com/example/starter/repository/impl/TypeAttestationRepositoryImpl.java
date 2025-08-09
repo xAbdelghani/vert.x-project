@@ -14,6 +14,7 @@ public class TypeAttestationRepositoryImpl implements TypeAttestationRepository 
   private final PgPool pgPool;
 
   public TypeAttestationRepositoryImpl(PgPool pgPool) {
+
     this.pgPool = pgPool;
   }
 

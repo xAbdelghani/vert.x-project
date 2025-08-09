@@ -110,6 +110,70 @@ public class EmailService {
             """.formatted(link);
   }
 
+  // Add this method to your EmailService class
+
+  public Future<Void> sendContactFormEmail(String adminEmail, String senderName, String senderEmail, String message) {
+    MailMessage mailMessage = new MailMessage()
+      .setFrom(fromName + " <" + fromEmail + ">")
+      .setTo(adminEmail)
+      .setSubject("Nouveau message de contact - " + senderName)
+      .setHtml(buildContactFormHtml(senderName, senderEmail, message))
+      .setText(buildContactFormText(senderName, senderEmail, message));
+    // So admin can reply directly to the sender
+
+    return mailClient.sendMail(mailMessage).mapEmpty();
+  }
+
+  private String buildContactFormHtml(String senderName, String senderEmail, String message) {
+    return """
+    <html>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #1890ff; border-bottom: 2px solid #1890ff; padding-bottom: 10px;">
+                Nouveau Message de Contact
+            </h2>
+
+            <div style="background-color: white; padding: 20px; border-radius: 5px; margin-top: 20px;">
+                <h3 style="color: #333;">Informations de l'expéditeur:</h3>
+                <p style="margin: 10px 0;">
+                    <strong>Nom:</strong> %s
+                </p>
+                <p style="margin: 10px 0;">
+                    <strong>Email:</strong> <a href="mailto:%s">%s</a>
+                </p>
+
+                <h3 style="color: #333; margin-top: 30px;">Message:</h3>
+                <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">%s</div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center; color: #666; font-size: 12px;">
+                <p>Ce message a été envoyé depuis le formulaire de contact du site.</p>
+                <p>Vous pouvez répondre directement à cet email pour contacter l'expéditeur.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """.formatted(senderName, senderEmail, senderEmail, message);
+  }
+
+  private String buildContactFormText(String senderName, String senderEmail, String message) {
+    return String.format(
+      "Nouveau Message de Contact\n" +
+        "========================\n\n" +
+        "De: %s\n" +
+        "Email: %s\n\n" +
+        "Message:\n" +
+        "--------\n" +
+        "%s\n\n" +
+        "--------\n" +
+        "Ce message a été envoyé depuis le formulaire de contact du site.\n" +
+        "Vous pouvez répondre directement à cet email pour contacter l'expéditeur.",
+      senderName, senderEmail, message
+    );
+  }
+
+  
+
 
 
 }
