@@ -78,6 +78,9 @@ public class ServiceRegistry {
 
   private void initBusinessServices() {
 
+    DashboardService dashboardService = new DashboardServiceImpl(pgPool);
+    services.put("dashboardService", dashboardService);
+
     NotificationService notificationService = new NotificationServiceImpl(
       getRepository("notificationRepository", NotificationRepository.class)
     );
@@ -211,6 +214,10 @@ public class ServiceRegistry {
 
 
   private void initHandlers() {
+
+    handlers.put("dashboardHandler", new DashboardHandler(
+      getService("dashboardService", DashboardService.class)
+    ));
 
     handlers.put("ContactMessageHandler", new ContactMessageHandler(
       getService("emailService", EmailService.class),"aboumada.abdelghani@gmail.com"

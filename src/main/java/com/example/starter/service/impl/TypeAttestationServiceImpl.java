@@ -35,7 +35,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
   public Future<JsonObject> createType(JsonObject data) {
     String libelle = data.getString("libelle");
     BigDecimal prixUnitaire = new BigDecimal(data.getString("prix_unitaire", "0"));
-    String devise = data.getString("devise", "MAD");
+    String devise = "MAD"; // SIMPLE CHANGE: Always use MAD
 
     if (libelle == null || libelle.trim().isEmpty()) {
       return Future.failedFuture("Le libellé est requis");
@@ -55,7 +55,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
         TypeAttestation type = new TypeAttestation();
         type.setLibelle(libelle);
         type.setPrixUnitaire(prixUnitaire);
-        type.setDevise(devise);
+        type.setDevise("MAD"); // SIMPLE CHANGE: Always MAD
 
         return typeRepository.save(type)
           .map(id -> new JsonObject()
@@ -95,7 +95,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
 
         String libelle = data.getString("libelle");
         BigDecimal prixUnitaire = new BigDecimal(data.getString("prix_unitaire", "0"));
-        String devise = data.getString("devise", existing.getDevise());
+        String devise = "MAD"; // SIMPLE CHANGE: Always use MAD
 
         if (libelle == null || libelle.trim().isEmpty()) {
           return Future.failedFuture("Le libellé est requis");
@@ -116,7 +116,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
               TypeAttestation updated = new TypeAttestation();
               updated.setLibelle(libelle);
               updated.setPrixUnitaire(prixUnitaire);
-              updated.setDevise(devise);
+              updated.setDevise("MAD"); // SIMPLE CHANGE: Always MAD
 
               return typeRepository.update(id, updated)
                 .map(v -> new JsonObject()
@@ -126,7 +126,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
           TypeAttestation updated = new TypeAttestation();
           updated.setLibelle(libelle);
           updated.setPrixUnitaire(prixUnitaire);
-          updated.setDevise(devise);
+          updated.setDevise("MAD"); // SIMPLE CHANGE: Always MAD
 
           return typeRepository.update(id, updated)
             .map(v -> new JsonObject()
@@ -258,7 +258,7 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
       .put("id", type.getId())
       .put("libelle", type.getLibelle())
       .put("prix_unitaire", type.getPrixUnitaire())
-      .put("devise", type.getDevise());
+      .put("devise", "MAD"); // SIMPLE CHANGE: Always show MAD
   }
 
   private JsonObject authToJson(AttestationAutoriser auth) {
@@ -273,7 +273,8 @@ public class TypeAttestationServiceImpl implements TypeAttestationService {
 
     if (auth.getTypeAttestation() != null) {
       json.put("type_libelle", auth.getTypeAttestation().getLibelle())
-        .put("prix_unitaire", auth.getTypeAttestation().getPrixUnitaire());
+        .put("prix_unitaire", auth.getTypeAttestation().getPrixUnitaire())
+        .put("devise", "MAD"); // SIMPLE CHANGE: Add MAD to authorization display
     }
     return json;
   }

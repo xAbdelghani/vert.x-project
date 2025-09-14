@@ -36,10 +36,9 @@ public class PrepayeServiceImpl implements PrepayeService {
 
   @Override
   public Future<JsonObject> initializePrepaye(Long compagnieId, BigDecimal initialAmount, String devise) {
-    // Validate devise
-    if (devise == null || devise.trim().isEmpty()) {
-      devise = "MAD"; // Default to MAD
-    }
+    // SIMPLE CHANGE: Always use MAD, ignore devise parameter
+    devise = "MAD";
+
     // Check if PREPAYE balance already exists
     String finalDevise = devise;
     String finalDevise1 = devise;
@@ -55,7 +54,7 @@ public class PrepayeServiceImpl implements PrepayeService {
         solde.setSolde(initialAmount);
         solde.setType("PREPAYE");
         solde.setStatut("ACTIF");
-        solde.setDevise(finalDevise); // Use the provided devise
+        solde.setDevise("MAD"); // SIMPLE CHANGE: Always MAD
         solde.setDateAbonnement(LocalDate.now());
 
         return soldeRepository.save(solde);
@@ -69,7 +68,7 @@ public class PrepayeServiceImpl implements PrepayeService {
           transaction.setMontant(initialAmount);
           transaction.setSoldeAvant(BigDecimal.ZERO);
           transaction.setSoldeApres(initialAmount);
-          transaction.setDescription("Initial PREPAYE balance - " + finalDevise1);
+          transaction.setDescription("Initial PREPAYE balance - MAD"); // SIMPLE CHANGE
           transaction.setDateTransaction(LocalDateTime.now());
 
           return transactionRepository.save(transaction)
@@ -77,7 +76,7 @@ public class PrepayeServiceImpl implements PrepayeService {
               .put("solde_id", soldeId)
               .put("transaction_id", transactionId)
               .put("initial_balance", initialAmount)
-              .put("devise", finalDevise1)
+              .put("devise", "MAD") // SIMPLE CHANGE
               .put("status", "SUCCESS")
               .put("message", "PREPAYE account initialized successfully"));
         }
@@ -85,7 +84,7 @@ public class PrepayeServiceImpl implements PrepayeService {
         return Future.succeededFuture(new JsonObject()
           .put("solde_id", soldeId)
           .put("initial_balance", initialAmount)
-          .put("devise", finalDevise1)
+          .put("devise", "MAD") // SIMPLE CHANGE
           .put("status", "SUCCESS")
           .put("message", "PREPAYE account initialized successfully"));
       });
@@ -109,6 +108,7 @@ public class PrepayeServiceImpl implements PrepayeService {
           return new JsonObject()
             .put("compagnie_id", compagnieId)
             .put("solde", 0)
+            .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
             .put("status", "NO_PREPAYE_BALANCE")
             .put("message", "Company does not have PREPAYE account");
         }
@@ -148,6 +148,7 @@ public class PrepayeServiceImpl implements PrepayeService {
                 .put("old_balance", oldBalance)
                 .put("amount_added", amount)
                 .put("new_balance", newBalance)
+                .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
                 .put("status", "SUCCESS")
                 .put("message", "Credit added successfully"));
           });
@@ -191,6 +192,7 @@ public class PrepayeServiceImpl implements PrepayeService {
                 .put("old_balance", oldBalance)
                 .put("amount_deducted", amount)
                 .put("new_balance", newBalance)
+                .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
                 .put("status", "SUCCESS")
                 .put("message", "Debit processed successfully"));
           });
@@ -205,7 +207,8 @@ public class PrepayeServiceImpl implements PrepayeService {
           return false;
         }
         return solde.getSolde().compareTo(amount) >= 0;
-      });
+      }
+      );
   }
 
   @Override
@@ -252,7 +255,7 @@ public class PrepayeServiceImpl implements PrepayeService {
       .put("solde", solde.getSolde())
       .put("type", solde.getType())
       .put("statut", solde.getStatut())
-      .put("devise", solde.getDevise());
+      .put("devise", "MAD"); // SIMPLE CHANGE: Always show MAD
 
     if (solde.getCompagnie() != null) {
       json.put("compagnie_name", solde.getCompagnie().getRaison_social());
@@ -279,6 +282,7 @@ public class PrepayeServiceImpl implements PrepayeService {
       .put("id", transaction.getId())
       .put("type", transaction.getType())
       .put("montant", transaction.getMontant())
+      .put("devise", "MAD") // SIMPLE CHANGE: Add MAD to transactions
       .put("solde_avant", transaction.getSoldeAvant())
       .put("solde_apres", transaction.getSoldeApres())
       .put("description", transaction.getDescription())

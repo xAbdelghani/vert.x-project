@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatutCRepositoryImpl implements StatutCRepository {
+
   private final PgPool pgPool;
 
   public StatutCRepositoryImpl(PgPool pgPool) {

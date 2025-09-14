@@ -32,6 +32,35 @@ public class CompagnieRegistrationService {
       data.getString("adresse")
     );
   }
+  // Update compagnie information
+  public Future<JsonObject> updateCompagnie(Long compagnieId, JsonObject updateData) {
+    Promise<JsonObject> promise = Promise.promise();
+
+    compagnieRepository.findById(compagnieId).compose(compagnie -> {
+      if (compagnie == null) {
+        return Future.failedFuture("Compagnie not found");
+      }
+
+      String nom = updateData.getString("nom");
+      String raisonSocial = updateData.getString("raison_social");
+      String email = updateData.getString("email");
+      String telephone = updateData.getString("telephone");
+      String adresse = updateData.getString("adresse");
+
+      return compagnieRepository.update(compagnieId, nom, raisonSocial, email, telephone, adresse)
+        .compose(v -> {
+          return Future.succeededFuture(
+            new JsonObject()
+              .put("compagnieId", compagnieId)
+              .put("message", "Compagnie updated successfully")
+          );
+        });
+    }).onComplete(promise);
+
+    return promise.future();
+  }
+
+
   // Step 2: Create Keycloak account & update compagnie record
   public Future<JsonObject> createCompagnieAccount(Long compagnieId, String nom) {
     Promise<JsonObject> promise = Promise.promise();
@@ -40,9 +69,8 @@ public class CompagnieRegistrationService {
       if (compagnie == null) {
         return Future.failedFuture("Compagnie not found");
       }
-
       String email = compagnie.getEmail();
-      String generatedPassword = "password123";
+      String generatedPassword = "Kx9#mL2pQw8@vN5r";
 
       JsonObject userData = new JsonObject()
         .put("username", nom)

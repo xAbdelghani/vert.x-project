@@ -19,8 +19,8 @@ public class Application {
       .put("database", new JsonObject()
         .put("host", "localhost")
         .put("port", 5432)
-       // .put("database", "vertxData")
-        .put("database", "test3")
+        .put("database", "vertxData")
+        .put("database", "test15")
         .put("user", "postgres")
         .put("password", "user"))
       .put("keycloak", new JsonObject()
@@ -47,5 +47,8 @@ public class Application {
         System.err.println("Failed to deploy MainVerticle");
         err.printStackTrace();
       });
+
   }
+
+
 }

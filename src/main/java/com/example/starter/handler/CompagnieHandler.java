@@ -98,6 +98,21 @@ public class CompagnieHandler {
         .putHeader("content-type", "application/json")
         .end(new JsonObject().put("error", err.getMessage()).encode()));
   }
+  // PUT /api/compagnies/:id
+  public void updateCompagnie(RoutingContext ctx) {
+    Long compagnieId = Long.valueOf(ctx.pathParam("id"));
+    JsonObject body = ctx.body().asJsonObject();
+
+    registrationService.updateCompagnie(compagnieId, body)
+      .onSuccess(result -> ctx.response()
+        .setStatusCode(200)
+        .putHeader("content-type", "application/json")
+        .end(result.encode()))
+      .onFailure(err -> ctx.response()
+        .setStatusCode(400)
+        .putHeader("content-type", "application/json")
+        .end(new JsonObject().put("error", err.getMessage()).encode()));
+  }
 
 
 

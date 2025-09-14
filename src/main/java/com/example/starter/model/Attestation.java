@@ -7,7 +7,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class Attestation {
-
   private Long id;
   private Long compagnieId;
   private Long vehiculeId;
@@ -27,5 +26,4 @@ public class Attestation {
   private Compagnie compagnie;
   private Vehicule vehicule;
   private TypeAttestation typeAttestation;
-
 }

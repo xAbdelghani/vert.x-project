@@ -61,6 +61,7 @@ public class AppRouter {
     mountAttestationRoutes(router);
     mountNotificationRoutes(router);
     mountContactRoutesM(router);
+    mountDashboardRoutes(router);
     return router;
 
   }
@@ -146,6 +147,8 @@ public class AppRouter {
 
     router.post("/api/v1/compagnie/save")
       .handler(ctx -> CompagnieHandler.createCompagnie(ctx));
+
+    router.put("/api/compagnies/:id").handler(CompagnieHandler::updateCompagnie);
 
     router.get("/api/v1/compagnies")
       .handler(ctx -> CompagnieHandler.getAllCompagnies(ctx));
@@ -354,6 +357,37 @@ public class AppRouter {
     // Expire attestations (for scheduled job or manual trigger)
     router.post("/api/attestations/expire")
       .handler(handler::expireAttestations);
+  }
+
+  private void mountDashboardRoutes(Router router) {
+    DashboardHandler handler = registry.getHandler("dashboardHandler", DashboardHandler.class);
+
+    // Main dashboard endpoint - returns all stats
+    router.get("/api/dashboard/stats")
+      .handler(handler::getDashboardStats);
+
+    // Individual stat endpoints
+    router.get("/api/dashboard/companies")
+      .handler(handler::getCompanyStats);
+
+    router.get("/api/dashboard/attestations")
+      .handler(handler::getAttestationStats);
+
+    router.get("/api/dashboard/financial")
+      .handler(handler::getFinancialStats);
+
+    router.get("/api/dashboard/today")
+      .handler(handler::getTodayActivity);
+
+    // List endpoints
+    router.get("/api/dashboard/recent-attestations")
+      .handler(handler::getRecentAttestations);
+
+    router.get("/api/dashboard/low-balance")
+      .handler(handler::getLowBalanceCompanies);
+
+    router.get("/api/dashboard/expiring")
+      .handler(handler::getExpiringAttestations);
   }
 
 

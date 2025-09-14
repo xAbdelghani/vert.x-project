@@ -13,6 +13,7 @@ import java.util.Set;
 public class PolicyEnforcerHandler implements Handler<RoutingContext> {
 
   private final OAuth2Auth oauth2;
+
   private final List<AuthorizationConfig.ResourceMapping> resourceMappings;
 
   public PolicyEnforcerHandler(OAuth2Auth oauth2) {

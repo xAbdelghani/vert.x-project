@@ -31,6 +31,17 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
       .execute(Tuple.of(raisonSocial, email, telephone, adresse))
       .map(rows -> rows.iterator().next().getLong("id"));
   }
+  public Future<Void> update(Long id, String nom, String raisonSocial, String email,
+                             String telephone, String adresse) {
+    String sql = """
+      UPDATE compagnies
+      SET nom = $1, raison_social = $2, email = $3, telephone = $4, adresse = $5
+      WHERE id = $6
+    """;
+    return pgPool.preparedQuery(sql)
+      .execute(Tuple.of(nom, raisonSocial, email, telephone, adresse, id))
+      .mapEmpty();
+  }
 
   // Step 2: Update login (nom) and password
   public Future<Void> createAccountForCompagnie(Long id, String nom, String password) {
@@ -111,5 +122,8 @@ public class CompagnieRepositoryImpl  implements CompagnieRepository {
     );
     return compagnie;
   }
+
+
+
 
 }

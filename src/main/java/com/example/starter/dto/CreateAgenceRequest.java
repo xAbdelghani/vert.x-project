@@ -12,6 +12,7 @@ public class CreateAgenceRequest {
   private String adressea;
   private String telephonea;
   private LocalDate dateDebuta;
+  private LocalDate dateFina;
   private Long compagnieId;
 
 }

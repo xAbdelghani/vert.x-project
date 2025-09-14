@@ -7,8 +7,10 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class TypeAttestation {
+
   private Long id;
   private String libelle;
   private BigDecimal prixUnitaire;
   private String devise;
+
 }

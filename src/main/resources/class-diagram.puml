@@ -1,0 +1,226 @@
+@startuml
+
+' Model Classes
+package "com.example.starter.model" {
+  class Compagnie {
+    -Long id
+    -String nom
+    -String raison_social
+    -String adresse
+    -String telephone
+    -String email
+    -String statut
+    -String password
+    -BigDecimal soldeCompagnie
+  }
+
+  class Vehicule {
+    -Long id
+    -String immatriculation
+    -LocalDate dateImmatriculation
+    -Long modelId
+    -Long compagnieId
+    -Integer attestationCount
+  }
+
+  class ModeleVehicule {
+    -Long id
+    -String designation
+    -String type
+    -String marque
+    -Integer annee
+    -Double puissanceFiscale
+    -String carburant
+    -Integer vehicleCount
+  }
+
+  class Attestation {
+    -Long id
+    -Long compagnieId
+    -Long vehiculeId
+    -Long typeAttestationId
+    -Long factureId
+    -String referenceFlotte
+    -LocalDate dateGeneration
+    -LocalDate dateDebut
+    -LocalDate dateFin
+    -String qrCode
+    -String nomFichier
+    -String cheminDepotAttestationGeneree
+    -String resteAttributsJson
+    -byte[] fichierData
+    -String statut
+  }
+
+  class TypeAttestation {
+    -Long id
+    -String libelle
+    -BigDecimal prixUnitaire
+    -String devise
+  }
+
+  class Transaction {
+    -Long id
+    -Long compagnieId
+    -String type
+    -BigDecimal montant
+    -BigDecimal soldeAvant
+    -BigDecimal soldeApres
+    -String description
+    -LocalDateTime dateTransaction
+    -Long userId
+    -String reference
+  }
+
+  class Abonnement {
+    -Long id
+    -Long compagnieId
+    -Long typeAbonnementId
+    -LocalDate dateDebut
+    -LocalDate dateFin
+    -String statut
+  }
+
+  class TypeAbonnement {
+    -Long id
+    -String libelle
+    -BigDecimal prix
+    -String devise
+  }
+
+  class Agence {
+    -Long id
+    -Long compagnieId
+    -String nom
+    -String adresse
+    -String telephone
+  }
+
+  class SoldePrepaye {
+    -Long id
+    -Long compagnieId
+    -BigDecimal montant
+    -LocalDateTime dateCreation
+    -String statut
+  }
+
+  class User {
+    -Long id
+    -String username
+    -String email
+    -String role
+  }
+
+  class Facture {
+    -Long id
+  }
+
+  class AttestationAutoriser {
+    -Long id
+    -Long compagnieId
+    -Long typeAttestationId
+    -Integer quantite
+  }
+
+  class Contact {
+    -Long id
+    -Long compagnieId
+    -String nom
+    -String prenom
+    -String telephone
+    -String email
+  }
+
+  class Pointvente {
+    -Long id
+    -String nom
+    -String adresse
+    -String telephone
+    -String email
+  }
+
+  class RelationPointventeCompagnie {
+    -Long id
+    -Long pointventeId
+    -Long compagnieId
+    -LocalDateTime dateCreation
+    -String statut
+  }
+
+  class StatutC {
+    -Long id
+    -String libelle
+  }
+
+  class StatutHistoriqueC {
+    -Long id
+    -Long compagnieId
+    -Long statutId
+    -LocalDateTime dateChangement
+    -String commentaire
+  }
+}
+
+' Repository Interfaces
+package "com.example.starter.repository" {
+  interface CompagnieRepository {
+    +Future<Long> save(String raisonSocial, String email, String telephone, String adresse)
+    +Future<Void> createAccountForCompagnie(Long id, String nom, String password)
+    +Future<Compagnie> findById(Long id)
+    +Future<Compagnie> findByEmail(String email)
+    +Future<List<Compagnie>> findAll()
+  }
+}
+
+' Repository Implementations
+package "com.example.starter.repository.impl" {
+  class CompagnieRepositoryImpl {
+    -PgPool pgPool
+    +Future<Long> save(String raisonSocial, String email, String telephone, String adresse)
+    +Future<Void> createAccountForCompagnie(Long id, String nom, String password)
+    +Future<Compagnie> findById(Long id)
+    +Future<Compagnie> findByEmail(String email)
+    +Future<List<Compagnie>> findAll()
+  }
+}
+
+' Service Classes
+package "com.example.starter.service" {
+  class CompagnieRegistrationService {
+    -CompagnieRepositoryImpl compagnieRepository
+    -KeycloakAdminService keycloakAdminService
+    -EmailService emailService
+    +Future<Long> createCompagnie(JsonObject data)
+    +Future<JsonObject> createCompagnieAccount(Long compagnieId, String nom)
+    +Future<List<Compagnie>> findAll()
+    +Future<Void> deleteCompagnie(Long id)
+    +Future<Void> deleteCompagnieAccountOnly(Long compagnieId)
+  }
+}
+
+' Relationships
+Compagnie "1" -- "many" Vehicule
+Compagnie "1" -- "many" Attestation
+Compagnie "1" -- "many" Abonnement
+Compagnie "1" -- "many" Agence
+Compagnie "1" -- "many" SoldePrepaye
+Compagnie "1" -- "many" AttestationAutoriser
+Compagnie "1" -- "many" Contact
+Compagnie "1" -- "many" Transaction
+Compagnie "1" -- "many" StatutHistoriqueC
+Compagnie "many" -- "many" Pointvente : RelationPointventeCompagnie
+
+Vehicule "many" -- "1" ModeleVehicule
+Vehicule "1" -- "many" Attestation
+
+Attestation "many" -- "1" TypeAttestation
+Attestation "many" -- "1" Facture
+
+Abonnement "many" -- "1" TypeAbonnement
+
+StatutHistoriqueC "many" -- "1" StatutC
+
+CompagnieRepository <|.. CompagnieRepositoryImpl
+CompagnieRegistrationService --> CompagnieRepositoryImpl : uses
+
+@enduml

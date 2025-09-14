@@ -3,6 +3,7 @@ package com.example.starter.model;
 import java.time.LocalDate;
 
 public class Vehicule {
+
   private Long id;
   private String immatriculation;
   private LocalDate dateImmatriculation;
@@ -78,4 +79,7 @@ public class Vehicule {
   public void setAttestationCount(Integer attestationCount) {
     this.attestationCount = attestationCount;
   }
+
+
+
 }

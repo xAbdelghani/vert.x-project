@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class TypeAbonnement {
+
   private Long id;
   private String libelle;
   private String categorie; // AVANCE or CAUTION
@@ -12,4 +13,5 @@ public class TypeAbonnement {
   private String unite;
   private String description;
   private Boolean actif;
+
 }

@@ -44,7 +44,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     Long compagnieId = data.getLong("compagnie_id");
     Long typeAbonnementId = data.getLong("type_abonnement_id");
     BigDecimal montant = new BigDecimal(data.getString("montant", "0"));
-    String devise = data.getString("devise", "MAD"); // Get devise from request
+    String devise = "MAD"; // SIMPLE CHANGE: Always use MAD
 
     // Validate inputs
     if (compagnieId == null || typeAbonnementId == null) {
@@ -84,7 +84,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         abonnement.setMontant(montant);
         abonnement.setType(typeAbonnement.getCategorie());
         abonnement.setStatut("ACTIF");
-        abonnement.setDevise(devise); // Use provided devise
+        abonnement.setDevise("MAD"); // SIMPLE CHANGE: Always MAD
 
         // Calculate end date if duration specified
         if (typeAbonnement.getDuree() != null && typeAbonnement.getDuree() > 0) {
@@ -262,7 +262,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     solde.setSolde(depositAmount);
     solde.setType("CAUTION");
     solde.setStatut("ACTIF");
-    solde.setDevise(devise); // Use provided devise
+    solde.setDevise("MAD"); // SIMPLE CHANGE: Always MAD
 
     return soldePrePayeRepository.save(solde)
       .compose(soldeId -> {
@@ -273,7 +273,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         transaction.setMontant(depositAmount);
         transaction.setSoldeAvant(BigDecimal.ZERO);
         transaction.setSoldeApres(depositAmount);
-        transaction.setDescription("Dépôt de garantie initial - " + devise);
+        transaction.setDescription("Dépôt de garantie initial - MAD"); // SIMPLE CHANGE
 
         return transactionRepository.save(transaction)
           .map(transactionId -> new JsonObject()
@@ -282,11 +282,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             .put("transaction_id", transactionId)
             .put("type", "CAUTION")
             .put("montant", depositAmount)
-            .put("devise", devise));
+            .put("devise", "MAD")); // Already MAD
       });
   }
-
-  // In SubscriptionServiceImpl.java - Update the enrichSubscriptionData method
 
   private Future<JsonObject> enrichSubscriptionData(Abonnement abonnement) {
     JsonObject json = new JsonObject()
@@ -295,7 +293,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
       .put("type", abonnement.getType())
       .put("montant", abonnement.getMontant())
       .put("statut", abonnement.getStatut())
-      .put("devise", abonnement.getDevise()) // ADD THIS LINE - Include devise
+      .put("devise", "MAD") // SIMPLE CHANGE: Always show MAD
       .put("date_abonnement", abonnement.getDateAbonnement().toString());
 
     if (abonnement.getDateFin() != null) {
@@ -327,10 +325,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             json.put("depot_initial", abonnement.getMontant());
             json.put("depot_utilise",
               abonnement.getMontant().subtract(solde.getSolde()));
-            // Also include the devise from solde if available
-            if (solde.getDevise() != null) {
-              json.put("devise", solde.getDevise());
-            }
+            // SIMPLE CHANGE: Always MAD
+            json.put("devise", "MAD");
           }
           return json;
         });
@@ -353,6 +349,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return startDate.plusMonths(dur); // Default to months
     }
   }
+
   @Override
   public Future<JsonObject> changeStatus(Long subscriptionId, String newStatus, String reason) {
     // Validate status
@@ -445,7 +442,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
   }
 
-// C) CREDIT MANAGEMENT FOR AVANCE
+  // C) CREDIT MANAGEMENT FOR AVANCE
 
   @Override
   public Future<Boolean> canUseCredit(Long compagnieId, BigDecimal amount) {
@@ -498,6 +495,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             .put("amount_used", amount)
             .put("credit_limit", abonnement.getMontant())
             .put("description", description)
+            .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
             .put("status", "SUCCESS"));
       });
   }
@@ -534,12 +532,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
               .put("usage_percentage",
                 totalUsed.divide(creditLimit, 2, RoundingMode.HALF_UP)
                   .multiply(new BigDecimal("100")))
+              .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
               .put("subscription_status", abonnement.getStatut());
           });
       });
   }
 
-// D) DEPOSIT MANAGEMENT FOR CAUTION
+  // D) DEPOSIT MANAGEMENT FOR CAUTION
 
   @Override
   public Future<Boolean> canUseDeposit(Long compagnieId, BigDecimal amount) {
@@ -593,6 +592,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     .put("amount_used", amount)
                     .put("old_balance", oldBalance)
                     .put("new_balance", newBalance)
+                    .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
                     .put("status", "SUCCESS"));
               });
           });
@@ -667,9 +667,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
               .put("usage_percentage",
                 usedAmount.divide(originalDeposit, 2, RoundingMode.HALF_UP)
                   .multiply(new BigDecimal("100")))
+              .put("devise", "MAD") // SIMPLE CHANGE: Add MAD
               .put("subscription_status", abonnement.getStatut());
           });
       });
   }
-
 }

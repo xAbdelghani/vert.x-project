@@ -8,7 +8,9 @@ import lombok.Setter;
 public class AttestationAutoriser {
 
   private Long compagnieId;
+
   private Long typeAttestationId;
+
   private Boolean flag;
 
   // For joins
