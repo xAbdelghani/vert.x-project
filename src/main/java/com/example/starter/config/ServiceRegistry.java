@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class ServiceRegistry {
 
+    private final Map<String, Object> handlerxxxcs = new HashMap<>();
+
   private final Map<String, Object> handlers = new HashMap<>();
   private final Map<String, Object> services = new HashMap<>();
   private final Map<String, Object> repositories = new HashMap<>();
